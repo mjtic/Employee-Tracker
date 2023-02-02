@@ -1,7 +1,24 @@
+//Dependencies
 //inquirer
 const inquirer = require("inquirer");
+//mysql2
+const mysql= require("mysql2");
 //console.table
 require("console.table");
+
+// create the connection to database
+const connection = mysql.createConnection(
+  {
+    host: 'localhost',
+    // MySQL username,
+    user: 'root',
+    // TODO: Add MySQL password
+    password: 'Wldkcl0522',
+    database: 'employee_tracker_db'
+  },
+  console.log(`Connected to the books_db database.`)
+);
+
 
 function startMenu() {
   inquirer
@@ -52,18 +69,21 @@ function startMenu() {
 
 //View all department function
 function viewAllDepts (){
+  connection.query('SELECT * FROM department;', function(err,results){
+    if (err) {
+      console.log(err);
+    }
+    console.table(results);
+  });
 //formatted table showing dept. names and dept. ids
-    return startMenu();
 }
 //View all role function
 function viewAllRoles(){
 //job title, role id, dept., salary
-    return startMenu();
 }
 //View all employee funciton
 function viewAllEmps (){
 //formatted table showing employee data (ids, first_name, last_name, job_titles, dept, salary, manager(supervisor))
-    return startMenu();
 }
 
 
