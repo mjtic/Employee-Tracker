@@ -6,32 +6,33 @@ CREATE DATABASE employee_tracker_db;
 USE employee_tracker_db;
 
 -- Dept. Table
-CREATE TABLE department (
+CREATE TABLE department(
   id INT NOT NULL AUTO_INCREMENT,
-  name VARCHAR(30) NOT NULL, -- to hold dept. name
+  name VARCHAR(30) NOT NULL, 
   PRIMARY KEY (id)
 );
 -- Role Table
-CREATE TABLE role (
+CREATE TABLE roles (
   id INT NOT NULL AUTO_INCREMENT,
-  title VARCHAR(30) NOT NULL, -- to hold role title
-  salary DECIMAL (65,30) NOT NULL, -- to hold role salary
-  department_id INT NOT NULL--foreign key references to dept (id)
+  title VARCHAR(30) NOT NULL, 
+  salary DECIMAL NOT NULL,
+  department_id INT,
+  PRIMARY KEY (id),
   FOREIGN KEY (department_id)
-  REFERENCES department (id)
-  ON DELETE SET NULL,
-  PRIMARY KEY (id)
+  REFERENCES department(id)
+  ON DELETE SET NULL
 );
 -- Employee table
 CREATE TABLE employee (
-  id INT NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL AUTO_INCREMENT ,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  role_id INT NOT NULL, --foreign key refrences on role (id)
-  manager_id INT, --holds 
-  FOREIGN KEY (role_id)
-  REFERENCES role (id),
-  FOREIGN KEY (manager_id)
-  REFERENCES employee (id),
-  PRIMARY KEY (id)
+  role_id INT, 
+  manager_id INT,
+  department_id INT, 
+  PRIMARY KEY (id),
+  FOREIGN KEY (role_id) 
+  REFERENCES roles(id),
+  FOREIGN KEY(manager_id)
+  REFERENCES employee(id)
 );
