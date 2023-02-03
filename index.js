@@ -1,22 +1,39 @@
 //Dependencies
 //inquirer
-const inquirer = require("inquirer");
-//mysql2
-const mysql= require("mysql2");
-//console.table
-require("console.table");
+// const inquirer = require("inquirer");
+// const connection = require('./db/connection');
+// // mysql2
+// const mysql= require("mysql2");
+// //console.table
+// require("console.table");
 
+// require('dotenv').config();
 // create the connection to database
+// const connection = mysql.createConnection(
+//   process.env.DATABASE,
+//   process.env.DB_USER,
+//   process.env.DB_PASSWORD,
+//   {
+//     host: 'localhost',
+//     dialect: 'mysql',
+//     port: 3306
+//   },
+//   console.log(`Connected to the books_db database.`)
+// );
+
+const inquirer = require('inquirer');
+const mysql = require('mysql2');
+require('console.table');
+require('dotenv').config();
+
 const connection = mysql.createConnection(
-  {
-    host: 'localhost',
-    // MySQL username,
-    user: 'root',
-    // TODO: Add MySQL password
-    password: 'Wldkcl0522',
-    database: 'employee_tracker_db'
-  },
-  console.log(`Connected to the books_db database.`)
+    {
+        host: 'localhost',
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DATABASE
+    }, 
+    console.log('Connected to the employee_tracker_db.')
 );
 
 
@@ -26,7 +43,7 @@ function startMenu() {
       {
         type: "list",
         name: "userChoice",
-        message: "Please choose your menu:",
+        message: "What would you like to do?",
         choices: [
           "View all departments.",
           "View all roles.",
@@ -34,7 +51,8 @@ function startMenu() {
           "Add a departmnet.",
           "Add a role.",
           "Add an employee.",
-          "Update Employee role"
+          "Update Employee role",
+          "Exit"
         ],
       },
     ])
@@ -60,16 +78,17 @@ function startMenu() {
           break;          
         case "Update employee role.":
           UpdateEmp();
-          break;     
-        default:
           break;
+        case "Exit.":
+          connection.end();
+          break;          
       }
     });
 }
 
 //View all department function
 function viewAllDepts (){
-  connection.query('SELECT * FROM department;', function(err,results){
+  connection.promise().query('SELECT id AS Dept_ID, name AS Dept_NAME FROM department;', function(err,results){
     if (err) {
       console.log(err);
     }
