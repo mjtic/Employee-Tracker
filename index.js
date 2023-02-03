@@ -21,21 +21,24 @@
 //   console.log(`Connected to the books_db database.`)
 // );
 
-const inquirer = require('inquirer');
-const mysql = require('mysql2');
-require('console.table');
-require('dotenv').config();
+const inquirer = require("inquirer");
+const mysql = require("mysql2");
+require("console.table");
+require("dotenv").config();
 
 const connection = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DATABASE
-    }, 
-    console.log('Connected to the employee_tracker_db.')
+  {
+    host: "localhost",
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DATABASE,
+  },
+  console.log("Connected to the employee_tracker_db.")
 );
 
+connection.connect(function (err) {
+  if (err) throw err;
+});
 
 function startMenu() {
   inquirer
@@ -52,7 +55,7 @@ function startMenu() {
           "Add a role.",
           "Add an employee.",
           "Update Employee role",
-          "Exit"
+          "Exit",
         ],
       },
     ])
@@ -75,38 +78,48 @@ function startMenu() {
           break;
         case "Add an employee.":
           AddEmp();
-          break;          
+          break;
         case "Update employee role.":
           UpdateEmp();
           break;
         case "Exit.":
           connection.end();
-          break;          
+          break;
       }
     });
 }
 
 //View all department function
-function viewAllDepts (){
-  connection.promise().query('SELECT id AS Dept_ID, name AS Dept_NAME FROM department;', function(err,results){
-    if (err) {
-      console.log(err);
+function viewAllDepts() {
+  connection.query(
+    "SELECT name AS Dept_NAME, id AS Dept_ID FROM department",
+    function (err, results) {
+      if (err) {
+        console.log(err);
+      }
+      console.table(results);
+      return startMenu();
     }
-    console.table(results);
-  });
-//formatted table showing dept. names and dept. ids
+  );
+  //formatted table showing dept. names and dept. ids
 }
 //View all role function
-function viewAllRoles(){
-//job title, role id, dept., salary
+function viewAllRoles() {
+  connection.query(
+    "SELECT roles.id AS Role_ID, roles.title AS Job_Title, department.name AS Department, roles.salary AS Salaries FROM roles JOIN department ON roles.department_id = department.id",
+    function (err, results){
+      if (err) {
+        console.log (err);
+      }
+      console.table(results);
+      return startMenu();
+    }
+  )
+  //job title, role id, dept., salary
 }
 //View all employee funciton
-function viewAllEmps (){
-//formatted table showing employee data (ids, first_name, last_name, job_titles, dept, salary, manager(supervisor))
+function viewAllEmps() {
+  //formatted table showing employee data (ids, first_name, last_name, job_titles, dept, salary, manager(supervisor))
 }
-
-
-
-
 
 startMenu();
