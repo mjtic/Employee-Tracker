@@ -84,8 +84,8 @@ function startMenu() {
         case "Update employee role.":
           updateEmp();
           break;
-        case "Exit.":
-          connection.end();
+        
+        default: connection.end();
           break;
       }
     });
@@ -138,37 +138,72 @@ async function addDept() {
 }
 //prompted to enter the name, salary, and department for the role and that role is added to the database
 
-async function addRole() {
-  const addNewRoles = await connection.query("SELECT id AS VALUE, name FROM department");
-  let finalRoles = addNewRoles.map(({ id, name}) => ({
-    value: id,
-    name: `${name}`, 
-  }));
-  console.log(addRole);
-  const answer = await inquirer.prompt([
+addRole = () => {
+  inquirer.prompt([
     {
-      type: "input",
-      name: "newRole",
-      message: "What is the name of the new role?",
+      type: 'input', 
+      name: 'roles',
+      message: "What roles do you want to add?",
+      validate: addRole => {
+        if (addRole) {
+            return true;
+        } else {
+            console.log('Please enter a role');
+            return false;
+        }
+      }
     },
     {
-      type: "input",
-      name: "salary",
-      message: "What is the salary of the new role?",
-    },
-    {
-      type: "list",
-      name: "department",
-      choices: finalRoles,
-    },
-  ]);
-  const newRole = await connection.query(
-    `INSERT INTO roles (title, salary) VALUES ("${answer.newRole}","${answer.salary}), INSERT INTO department (name) VALUES ("${answer.department}")`
-  );
-  console.table(newRole);
-  console.log(`Successfully added the ${answer.newRole} into roles`);
-  startMenu();
-}
+      type: 'input', 
+      name: 'salary',
+      message: "What is the salary of this role?",
+      validate: addSalary => {
+        if (addSalary) {
+            return true;
+        } else {
+            console.log('Please enter a salary');
+            return false;
+        }
+      }
+    }
+  ])
+    .then(answer => {
+      const params = [answer.roles, answer.salary];
+
+      // grab dept from department table
+      const roleSql = `SELECT * FROM department`; 
+
+      connection.query(roleSql, (err, data) => {
+        if (err) throw err; 
+    
+        const dept = data.map(({ name, id }) => ({ name: name, value: id }));
+
+        inquirer.prompt([
+        {
+          type: 'list', 
+          name: 'dept',
+          message: "What department is this role in?",
+          choices: dept
+        }
+        ])
+          .then(deptChoice => {
+            const dept = deptChoice.dept;
+            params.push(dept);
+
+            const sql = `INSERT INTO roles (title, salary, department_id)
+                        VALUES (?, ?, ?)`;
+
+            connection.query(sql, params, (err, result) => {
+              if (err) throw err;
+              console.log('Added' + answer.roles + " to roles!"); 
+
+              startMenu();
+       });
+     });
+   });
+ });
+};
+
 
 //formatted table showing employee data (ids, first_name, last_name, job_titles, dept, salary, manager(supervisor))
 
