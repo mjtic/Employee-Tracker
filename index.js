@@ -119,6 +119,16 @@ function viewAllRoles() {
 }
 //View all employee funciton
 function viewAllEmps() {
+  connection.query(
+    "SELECT employee.id AS Employee_ID, employee.first_name AS First_Name, employee.last_name AS Last_Name, roles.title AS Title, department.name AS Department, roles.salary AS Salaries, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager FROM employee employee LEFT JOIN roles ON employee.role_id = roles.id LEFT JOIN department department ON department.id = roles.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id;",
+  function (err, results){
+    if(err) {
+      console.log(err);
+    }
+    console.table(results);
+    return startMenu();
+   }
+  )
   //formatted table showing employee data (ids, first_name, last_name, job_titles, dept, salary, manager(supervisor))
 }
 
